@@ -1,3 +1,8 @@
+---
+name: brand
+description: Accountable's fonts, colors and tone. Use for any UI/UX design, marketing, or branding work.
+---
+
 # Brand
 
 ## Fonts
