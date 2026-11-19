@@ -28,7 +28,7 @@ From any contact or deal you can log an activity (a note, call or email) and giv
 
 - **Organization**: a company we do business with. Name, website, industry and notes. An organization has many contacts and many deals.
 - **Contact**: a person we deal with. Name, email, phone, job title, the organization they belong to, and a status (lead, qualified or customer). A lead is a contact with the lead status, so there's no separate list of leads.
-- **Deal**: a potential sale. Name, the organization and the main contact it is with, its stage (New, Qualified, Proposal, Negotiation, Won or Lost), its value in US dollars, its probability of close, and its expected or actual close date. Each stage has a usual probability of close, and a deal takes its new stage's probability when it moves; a probability set by hand is kept until the stage changes. Won is 100% and Lost is 0%; the usual probabilities of the open stages are the builder's call.
+- **Deal**: a potential sale. Name, the organization and the main contact it is with, its stage (New, Qualified, Proposal, Negotiation, Won or Lost), its value in pounds sterling (£), its probability of close, and its expected or actual close date. Each stage has a usual probability of close, and a deal takes its new stage's probability when it moves; a probability set by hand is kept until the stage changes. Won is 100% and Lost is 0%; the usual probabilities of the open stages are the builder's call.
 - **Activity**: something that happened, or needs to happen, with a contact or deal. Type (note, call or email), the contact or deal it relates to, a description and when it happened, and optionally a follow-up date and whether it's done.
 
 Required fields: every record needs a name (or a description, for an activity). A contact needs an organization. A deal needs an organization, a main contact, a stage, a value and a close date, and its main contact must belong to the deal's organization.
@@ -39,7 +39,7 @@ Accountable comes with realistic sample data, so every screen looks alive the fi
 
 ### Look and feel
 
-The look follows Accountable's brand guidelines, which take priority over any general design guidance. The MVP is light mode, designed for a laptop or desktop screen. Dates are shown in UK format (19 Nov 2026); money is in US dollars.
+The look follows Accountable's brand guidelines, which take priority over any general design guidance. The MVP is light mode, designed for a laptop or desktop screen. Dates are shown in UK format (19 Nov 2026); money is in pounds sterling (£).
 
 ## Affected users and systems
 
@@ -53,7 +53,7 @@ The look follows Accountable's brand guidelines, which take priority over any ge
 - It runs locally with one documented command that works on Mac, Linux and Windows, and needs no internet connection to use.
 - Every change is kept: it's still there after a browser refresh, and every time the app starts it shows every change made before.
 - One documented command resets the data to the sample data, to start again from scratch.
-- Not in the MVP: sign-in, user accounts or several users; a dark mode or a layout for phones; AI features; email, calendar or phone integrations; currencies other than US dollars; reports beyond the dashboard; tags or custom fields; changing the pipeline stages; importing or exporting data.
+- Not in the MVP: sign-in, user accounts or several users; a dark mode or a layout for phones; AI features; email, calendar or phone integrations; currencies other than pounds sterling; reports beyond the dashboard; tags or custom fields; changing the pipeline stages; importing or exporting data.
 
 ## Success criteria
 
