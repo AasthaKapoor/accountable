@@ -169,27 +169,32 @@ Pipeline moves update the board optimistically: the card and the totals change s
 
 ### 6.1 Dashboard
 
-The page is laid out as a 12-column grid.
+The design is option B in `docs/mockups/option-b/dashboard.html`. The page is laid out as a 12-column grid.
 
-1. **Four headline figures**, each on its own panel:
-   - Open pipeline value.
-   - Expected revenue.
-   - Revenue won this month, with the change against last month.
-   - Win rate over the last 90 days (won divided by won plus lost).
-
-   Each panel shows the figure in large JetBrains Mono and a short label in Instrument Sans.
-2. **Revenue won by month**: a line chart of the last 12 months with a Sea Green line and a soft area fill (the one place a light gradient is allowed). The tooltip shows the month, the revenue and the number of deals.
-3. **Deals won and lost by month**: a grouped bar chart of the last 12 months, Sea Green for won and Coral for lost.
-4. **Sales funnel**: horizontal bars for New, Qualified, Proposal and Negotiation, then Won.
-   - Each bar is the total value of deals whose `furthest_stage` reached that stage. For Won, it's the value of the won deals.
-   - Each bar is labelled with its value and the conversion from the previous stage.
-5. **Pipeline by stage**: a stacked bar showing open value per stage, in the stage colours, with a "View pipeline" link.
-6. **Follow-ups**: two tabs, Overdue (shown first, with a Raspberry count badge) and Upcoming (the next 14 days).
-   - Each row shows the date, the description and the linked contact or deal.
-   - Each row has a checkbox that marks it done.
-7. **Recent activity**: the latest 15 activities, newest first.
-   - Each row has a type icon, the description, a link to the contact or deal (or its kept label, unlinked, if deleted) and a relative time.
-   - Stage changes show a small stage-coloured arrow.
+1. **Hero panel**, full width, on Midnight with Sea Mist and white text (16px radius). It has three parts:
+   - **Headline figures**, on the left:
+     - Open pipeline value, the largest figure on the page (46px JetBrains Mono).
+     - Below it, in a 2 by 2 grid:
+       - Expected revenue.
+       - Revenue won this month, with the change against last month.
+       - Win rate over the last 90 days (won divided by won plus lost), with a Sea Green ring and the won and lost counts.
+       - The number of open deals, and how many are late.
+   - **Revenue won by month**, on the right: a line chart of the last 12 months with a Sea Green line and a soft area fill. The tooltip shows the month, the revenue and the number of deals won.
+   - **Pipeline by stage**, along the bottom:
+     - A segmented bar of open value per stage, in the stage colours. Negotiation uses Sea Mist, because Midnight doesn't show on the dark panel.
+     - Each segment is labelled with the stage, its deal count and its value.
+     - A Sea Green "View pipeline" link.
+2. **Sales funnel** (8 columns): a column for each of New, Qualified, Proposal and Negotiation, then Won, stepping down left to right.
+   - Each column's height is the total value of deals whose `furthest_stage` reached that stage. For Won, it's the value of the won deals.
+   - The value sits above each column and the stage name below it.
+   - A small white badge between two columns shows the conversion from the stage before.
+3. **Deals won and lost by month** (4 columns): a stacked bar for each of the last 12 months, Sea Green for won and Coral for lost.
+4. **Follow-ups** (5 columns): two tabs, Overdue (shown first, with a Raspberry count badge) and Upcoming (the next 14 days).
+   - Each row shows a checkbox that marks it done, the date, the description, and the linked contact or deal.
+   - Overdue dates are in Raspberry.
+5. **Recent activity** (7 columns): the latest 15 activities, newest first, one line each.
+   - Each row has a dot, the description, a link to the contact or deal (or its kept label, unlinked, if deleted), the type and a relative time.
+   - For a stage change, the dot and a pill show the new stage's colour.
 
 ### 6.2 Tables (Organizations, Contacts, Deals)
 
@@ -236,24 +241,28 @@ Entries follow, newest first. Each shows a type icon, the description, its date,
 
 ### 6.4 Pipeline
 
-- Board totals sit above the board: open value and expected revenue.
-- There are six columns, New through Won and Lost. Each column header shows:
-  - the stage name;
-  - a coloured dot;
-  - the number of deals;
-  - the open value and expected revenue. These are blank for Won and Lost, which don't count toward totals.
-- Each card shows:
-  - the deal name;
-  - the organization;
-  - the value in JetBrains Mono;
-  - the probability;
+The design is option B in `docs/mockups/option-b/pipeline.html`.
+
+- A summary panel sits above the board, on Midnight like the dashboard hero. It shows:
+  - the open value, the expected revenue and the number of open deals;
+  - a segmented bar of open value per stage, labelled with the stage names.
+- The board sits in a white panel with six columns, New through Won and Lost.
+- Each column is tinted with its stage colour at about 8–12%.
+- Each column header shows:
+  - the stage name and a count badge;
+  - the column's open value in large JetBrains Mono, with its expected revenue below. These are blank for Won and Lost, which don't count toward totals.
+- Each card is white and shows, from the top:
+  - the value, in JetBrains Mono, as the card's largest text;
+  - the deal name and the organization;
+  - the probability as a thin bar in the stage colour, with the percentage beside it;
   - the close date.
-- A late card gets a Raspberry "Late" tag and Raspberry date text.
+- A late card gets a Raspberry "Late" tag in its top-right corner, and its date reads "Due 14 Nov 2026" in Raspberry.
 - A card can be dropped at any point in any column and stays exactly there.
 - While dragging, a lifted shadow follows the cursor and a placeholder shows where the card will land.
 - Every column ends with a "+ Add deal" button that opens the deal form with that stage set. The new deal goes to the bottom of the column.
 - Clicking a card opens the deal page.
 - The board scrolls sideways inside its panel when the window is too narrow for all six columns. The page itself never scrolls sideways.
+- Within a column, cards scroll inside it once they're taller than about 560px.
 
 ## 7. Visual design
 
@@ -296,9 +305,11 @@ The design follows the brand skill.
 
 **Surfaces**
 - Panels are rounded, with no outline and a very soft shadow.
+- Panels are white, except the dashboard hero and the pipeline summary, which are Midnight. On Midnight, text is white or Sea Mist, and Midnight-coloured marks use Sea Mist instead.
 - No one-edge borders and no top-of-page rule.
 - Table rows are separated by a faint row tint on hover, not by lines.
 - Gradients are limited to the revenue chart's area fill.
+- The mockups in `docs/mockups/option-b/` show these rules in use.
 
 **Formatting**
 - Money is shown as `£12,500` in tables and cards and as `£1.2M` or `£84K` on chart axes, always with the `£` sign.

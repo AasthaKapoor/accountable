@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard · Accountable · Option B</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../mockup.css">
+<style>
+  .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gutter); }
+  .span-4 { grid-column: span 4; }
+  .span-5 { grid-column: span 5; }
+  .span-7 { grid-column: span 7; }
+  .span-8 { grid-column: span 8; }
+  .span-12 { grid-column: span 12; }
+
+  /* Hero: Midnight panel with the headline figures, revenue chart and pipeline by stage */
+  .hero { background: var(--ink); color: var(--sea-mist); border-radius: 16px; padding: 28px; display: grid; grid-template-columns: 340px 1fr; gap: 32px; }
+  .hero-label { font-weight: 500; color: rgba(205, 216, 219, 0.75); }
+  .hero-big { font: 600 46px/1.1 var(--mono); color: #FFFFFF; letter-spacing: -0.03em; margin: 6px 0 22px; }
+  .hero-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 20px; }
+  .hero-stat .v { font: 600 21px/1.2 var(--mono); color: #FFFFFF; margin-top: 2px; }
+  .hero-stat .s { font-size: 12.5px; color: rgba(205, 216, 219, 0.7); display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+  .hero-stat .s svg { width: 14px; height: 14px; color: var(--tertiary); }
+  .ring { display: flex; align-items: center; gap: 10px; }
+
+  .hero-chart-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .hero-chart-head h2 { margin: 0; font-size: 16px; font-weight: 600; color: #FFFFFF; }
+  .hero svg text { font-family: var(--mono); font-size: 11px; fill: rgba(205, 216, 219, 0.6); }
+  .hero .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+  .hero-stack { grid-column: 1 / -1; display: grid; grid-template-columns: 340px 1fr; gap: 32px; align-items: center; padding-top: 4px; }
+  .hero-stack a { color: var(--primary); font-weight: 500; }
+  .stack { display: flex; gap: 4px; }
+  .stack > div { min-width: 0; }
+  .stack .bar { height: 12px; border-radius: 999px; }
+  .stack .lab { margin-top: 8px; font-size: 12.5px; color: rgba(205, 216, 219, 0.75); white-space: nowrap; }
+  .stack .lab .mono { color: #FFFFFF; display: block; font-size: 13px; }
+
+  /* Light panels */
+  .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .panel .chart text { font-family: var(--mono); font-size: 11px; fill: var(--ink-muted); }
+  .legend { display: flex; gap: 16px; color: var(--ink-muted); font-size: 13px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+  /* Funnel as columns stepping down */
+  .funnel { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; align-items: end; height: 250px; }
+  .fcol { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; position: relative; }
+  .fcol .fv { font: 600 15px var(--mono); margin-bottom: 8px; }
+  .fcol .fb { width: 72%; border-radius: 10px 10px 4px 4px; }
+  .fcol .fn { margin-top: 10px; font-weight: 500; }
+  .conv { position: absolute; left: -24px; bottom: 44px; height: 24px; padding: 0 8px; border-radius: 999px; background: var(--panel); box-shadow: 0 2px 8px rgba(7, 59, 76, 0.12); font: 600 11.5px/24px var(--mono); z-index: 1; }
+
+  /* Lists */
+  .rows { display: flex; flex-direction: column; }
+  .row { display: grid; align-items: center; gap: 12px; padding: 9px 8px; margin: 0 -8px; border-radius: 8px; }
+  .row:hover { background: var(--bg); }
+  .tabs { display: inline-flex; gap: 4px; padding: 4px; border-radius: 999px; background: var(--bg); }
+  .tab { display: inline-flex; align-items: center; gap: 8px; height: 30px; padding: 0 12px; border-radius: 999px; font-weight: 500; color: var(--ink-muted); }
+  .tab.active { background: var(--panel); color: var(--ink); box-shadow: var(--shadow); }
+
+  .follow-row { grid-template-columns: 20px 92px 1fr; }
+  .check { width: 18px; height: 18px; border-radius: 6px; border: 1.5px solid rgba(7, 59, 76, 0.3); }
+  .follow-row .d { font: 12.5px var(--mono); color: var(--alert); }
+  .follow-row .sub { font-size: 13px; }
+
+  .act-row { grid-template-columns: 10px 1fr auto auto; }
+  .act-row .ic { width: 16px; height: 16px; color: var(--ink-muted); }
+  .act-row .ic svg { width: 16px; height: 16px; display: block; }
+  .act-row .desc { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .act-row .desc a { margin-left: 6px; font-size: 13px; }
+  .act-row .t { color: var(--ink-muted); font-size: 12.5px; white-space: nowrap; }
+  .act-row .stage-pill { font-size: 11.5px; height: 20px; padding: 0 8px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar"></aside>
+  <main class="main">
+    <div class="title-row">
+      <div>
+        <h1>Dashboard</h1>
+        <div class="sub">Thursday 19 Nov 2026</div>
+      </div>
+      <button class="btn btn-primary" id="new-deal"></button>
+    </div>
+
+    <div class="grid">
+      <section class="hero span-12">
+        <div>
+          <div class="hero-label">Open pipeline value</div>
+          <div class="hero-big" id="open"></div>
+          <div class="hero-stats">
+            <div class="hero-stat"><div class="hero-label">Expected revenue</div><div class="v" id="expected"></div><div class="s">Value times probability</div></div>
+            <div class="hero-stat"><div class="hero-label">Won this month</div><div class="v" id="won"></div><div class="s" id="won-sub"></div></div>
+            <div class="hero-stat"><div class="hero-label">Win rate, 90 days</div>
+              <div class="ring">
+                <svg width="38" height="38" viewBox="0 0 38 38"><circle cx="19" cy="19" r="15" fill="none" stroke="rgba(205,216,219,0.15)" stroke-width="5"/><circle cx="19" cy="19" r="15" fill="none" stroke="#06D6A0" stroke-width="5" stroke-linecap="round" stroke-dasharray="0" id="ring" transform="rotate(-90 19 19)"/></svg>
+                <div><div class="v">67%</div><div class="s">8 won, 4 lost</div></div>
+              </div>
+            </div>
+            <div class="hero-stat"><div class="hero-label">Open deals</div><div class="v" id="open-count"></div><div class="s">4 running late</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="hero-chart-head"><h2>Revenue won by month</h2><span class="hero-label">Last 12 months</span></div>
+          <div class="chart" id="line"></div>
+        </div>
+        <div class="hero-stack">
+          <div style="display: flex; justify-content: space-between; align-items: baseline">
+            <span style="color: #FFFFFF; font-weight: 600; font-size: 16px">Pipeline by stage</span>
+            <a href="pipeline.html">View pipeline</a>
+          </div>
+          <div class="stack" id="stack"></div>
+        </div>
+      </section>
+
+      <section class="panel span-8">
+        <div class="panel-head"><h2>Sales funnel</h2><span class="hint">Value reaching each stage, and conversion from the stage before</span></div>
+        <div class="funnel" id="funnel"></div>
+      </section>
+
+      <section class="panel span-4">
+        <div class="panel-head">
+          <h2>Deals won and lost</h2>
+          <div class="legend"><span><i style="background: var(--primary)"></i>Won</span><span><i style="background: var(--tertiary)"></i>Lost</span></div>
+        </div>
+        <div class="chart" id="bars"></div>
+      </section>
+
+      <section class="panel span-5" style="align-self: start">
+        <div class="panel-head">
+          <h2>Follow-ups</h2>
+          <div class="tabs">
+            <span class="tab active">Overdue <span class="count-badge alert">5</span></span>
+            <span class="tab">Upcoming <span class="count-badge quiet">8</span></span>
+          </div>
+        </div>
+        <div class="rows" id="followups"></div>
+      </section>
+
+      <section class="panel span-7">
+        <div class="panel-head"><h2>Recent activity</h2></div>
+        <div class="rows" id="activity"></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script src="../data.js"></script>
+<script>
+  renderSidebar("dashboard");
+  document.getElementById("new-deal").innerHTML = icon("plus") + "New deal";
+
+  const open = openDeals();
+  const t = totals(open);
+  const nov = MONTHS[11].won, oct = MONTHS[10].won;
+  document.getElementById("open").textContent = fmtMoney(t.value);
+  document.getElementById("expected").textContent = fmtMoney(t.expected);
+  document.getElementById("won").textContent = fmtMoney(nov);
+  document.getElementById("won-sub").innerHTML = `${icon("down")}Down ${Math.round((1 - nov / oct) * 100)}% on October`;
+  document.getElementById("open-count").textContent = open.length;
+  const circ = 2 * Math.PI * 15;
+  document.getElementById("ring").setAttribute("stroke-dasharray", `${circ * 0.67} ${circ}`);
+
+  // Revenue line on the dark hero
+  (function () {
+    const W = 700, H = 210, L = 46, R = 8, T = 10, B = 26, max = 100000;
+    const x = (i) => L + (i * (W - L - R)) / 11;
+    const y = (v) => T + (1 - v / max) * (H - T - B);
+    const pts = MONTHS.map((d, i) => [x(i), y(d.won)]);
+    const line = pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" ");
+    let s = "";
+    for (let v = 0; v <= max; v += 25000) {
+      s += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="rgba(205,216,219,0.1)"/>`;
+      s += `<text x="${L - 10}" y="${y(v) + 4}" text-anchor="end">${v ? fmtShort(v) : "£0"}</text>`;
+    }
+    MONTHS.forEach((d, i) => (s += `<text x="${x(i)}" y="${H - 4}" text-anchor="middle">${d.m}</text>`));
+    const o = pts[10];
+    document.getElementById("line").innerHTML = `<svg viewBox="0 0 ${W} ${H}">
+      <defs><linearGradient id="f" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#06D6A0" stop-opacity="0.35"/><stop offset="1" stop-color="#06D6A0" stop-opacity="0"/></linearGradient></defs>
+      ${s}
+      <path d="${line} L ${x(11)} ${y(0)} L ${x(0)} ${y(0)} Z" fill="url(#f)"/>
+      <path d="${line}" fill="none" stroke="#06D6A0" stroke-width="2.5" stroke-linejoin="round"/>
+      <circle cx="${o[0]}" cy="${o[1]}" r="6" fill="#06D6A0" stroke="#073B4C" stroke-width="3"/>
+      <g transform="translate(${o[0] - 168} ${o[1] - 6})">
+        <rect width="154" height="44" rx="8" fill="#FFFFFF"/>
+        <text x="12" y="18" style="fill: #073B4C; font-family: 'Instrument Sans'; font-weight: 600; font-size: 12px">Oct 2026 · 3 deals won</text>
+        <text x="12" y="35" style="fill: #073B4C; font-size: 12px">${fmtMoney(oct)}</text>
+      </g>
+    </svg>`;
+  })();
+
+  // Pipeline by stage, inside the hero
+  document.getElementById("stack").innerHTML = STAGES.filter((s) => s.open).map((s) => {
+    const ds = open.filter((d) => d.stage === s.key);
+    const v = totals(ds).value;
+    return `<div style="flex: ${v}">
+      <div class="bar" style="background: ${STAGE_COLOUR[s.key] === STAGE_COLOUR.negotiation ? "#CDD8DB" : STAGE_COLOUR[s.key]}"></div>
+      <div class="lab">${s.name} · ${ds.length}<span class="mono">${fmtMoney(v)}</span></div>
+    </div>`;
+  }).join("");
+
+  // Funnel as stepped columns
+  document.getElementById("funnel").innerHTML = FUNNEL.map((f, i) => {
+    const conv = i ? `<span class="conv">${Math.round((f.value / FUNNEL[i - 1].value) * 100)}%</span>` : "";
+    return `<div class="fcol">${conv}
+      <span class="fv">${fmtShort(f.value)}</span>
+      <div class="fb" style="height: ${(f.value / FUNNEL[0].value) * 170}px; background: ${STAGE_COLOUR[f.key]}"></div>
+      <span class="fn">${f.name}</span>
+    </div>`;
+  }).join("");
+
+  // Won and lost, stacked per month to fit the narrower panel
+  (function () {
+    const W = 380, H = 250, L = 22, R = 4, T = 10, B = 26, max = 4;
+    const band = (W - L - R) / 12, bw = 16;
+    const y = (v) => T + (1 - v / max) * (H - T - B);
+    let s = "";
+    for (let v = 0; v <= max; v++) {
+      s += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="rgba(7,59,76,0.08)"/>`;
+      s += `<text x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${v}</text>`;
+    }
+    MONTHS.forEach((d, i) => {
+      const cx = L + band * i + band / 2;
+      if (d.wonCount) s += `<rect x="${cx - bw / 2}" y="${y(d.wonCount)}" width="${bw}" height="${y(0) - y(d.wonCount)}" rx="3" fill="#06D6A0"/>`;
+      if (d.lostCount) s += `<rect x="${cx - bw / 2}" y="${y(d.wonCount + d.lostCount)}" width="${bw}" height="${y(0) - y(d.lostCount) - 2}" rx="3" fill="#F78C6B"/>`;
+      s += `<text x="${cx}" y="${H - 4}" text-anchor="middle">${d.m[0]}</text>`;
+    });
+    document.getElementById("bars").innerHTML = `<svg viewBox="0 0 ${W} ${H}">${s}</svg>`;
+  })();
+
+  document.getElementById("followups").innerHTML = FOLLOW.map(([[y, m, d], desc, subject]) => `
+    <div class="row follow-row">
+      <span class="check"></span>
+      <span class="d">${fmtDate(new Date(y, m - 1, d))}</span>
+      <div>${desc}<div class="sub"><a href="#">${subject}</a></div></div>
+    </div>`).join("");
+
+  document.getElementById("activity").innerHTML = ACTIVITY.map(([type, desc, subject, linked, time, stage]) => {
+    const mark = type === "stage"
+      ? `<span class="dot" style="background: ${STAGE_COLOUR[stage]}"></span>`
+      : `<span class="dot" style="background: rgba(7,59,76,0.18)"></span>`;
+    const label = type === "stage" ? `<span class="pill ${stage} stage-pill">${STAGES.find((s) => s.key === stage).name}</span>` : `<span class="t">${type[0].toUpperCase() + type.slice(1)}</span>`;
+    const link = linked ? `<a href="#">${subject}</a>` : `<span class="muted" style="margin-left: 6px; font-size: 13px">${subject}</span>`;
+    return `<div class="row act-row">${mark}<span class="desc">${desc}${link}</span>${label}<span class="t">${time}</span></div>`;
+  }).join("");
+</script>
+</body>
+</html>

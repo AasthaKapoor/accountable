@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pipeline · Accountable</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../mockup.css">
+<style>
+  .board-totals { display: flex; gap: var(--gutter); margin-bottom: var(--gutter); }
+  .total { display: flex; flex-direction: column; gap: 2px; min-width: 220px; }
+  .total .label { color: var(--ink-muted); font-weight: 500; }
+  .total .value { font: 600 26px/1.2 var(--mono); letter-spacing: -0.02em; }
+
+  .board-panel { padding: 16px; overflow-x: auto; }
+  .board { position: relative; display: grid; grid-template-columns: repeat(6, minmax(170px, 1fr)); gap: 12px; align-items: start; }
+
+  .col { background: var(--bg); border-radius: 10px; padding: 12px 10px 10px; display: flex; flex-direction: column; gap: 10px; }
+  .col-head { padding: 0 4px; }
+  .col-title { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+  .col-title .count-badge { margin-left: auto; background: var(--panel); color: var(--ink-muted); }
+  .col-figures { margin-top: 6px; min-height: 36px; font-size: 12px; line-height: 1.5; }
+  .col-figures .mono { color: var(--ink); font-weight: 500; }
+
+  .cards { display: flex; flex-direction: column; gap: 8px; max-height: 560px; overflow-y: auto; }
+
+  .card {
+    background: var(--panel);
+    border-radius: 10px;
+    padding: 11px 12px;
+    box-shadow: 0 1px 2px rgba(7, 59, 76, 0.06);
+    cursor: grab;
+  }
+  .card-name { font-weight: 500; line-height: 1.3; }
+  .card-org { color: var(--ink-muted); font-size: 12.5px; margin-top: 2px; }
+  .card-figures { display: flex; justify-content: space-between; align-items: baseline; margin-top: 10px; }
+  .card-value { font: 600 14px var(--mono); }
+  .card-prob { font: 500 12px var(--mono); color: var(--ink-muted); }
+  .card-date { display: flex; align-items: center; gap: 6px; margin-top: 6px; font: 11.5px var(--mono); white-space: nowrap; color: var(--ink-muted); }
+  .card-date.late-text { color: var(--alert); }
+  .card-date .tag-late { margin-left: auto; font-family: var(--sans); }
+
+  .placeholder { border-radius: 10px; background: rgba(7, 59, 76, 0.07); border: 1.5px dashed rgba(7, 59, 76, 0.22); }
+
+  .card.lifted {
+    position: absolute;
+    z-index: 5;
+    transform: rotate(2.5deg);
+    box-shadow: 0 16px 36px rgba(7, 59, 76, 0.22), 0 3px 8px rgba(7, 59, 76, 0.1);
+    cursor: grabbing;
+  }
+
+  .add-deal { display: flex; align-items: center; justify-content: center; gap: 6px; height: 34px; border-radius: 8px; color: var(--ink-muted); font-weight: 500; }
+  .add-deal:hover { background: rgba(7, 59, 76, 0.05); color: var(--ink); }
+  .add-deal svg { width: 15px; height: 15px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar"></aside>
+  <main class="main">
+    <div class="title-row">
+      <h1>Pipeline</h1>
+      <button class="btn btn-primary" id="new-deal"></button>
+    </div>
+
+    <div class="board-totals">
+      <section class="panel total">
+        <span class="label">Open value</span>
+        <span class="value" id="t-value"></span>
+      </section>
+      <section class="panel total">
+        <span class="label">Expected revenue</span>
+        <span class="value" id="t-expected"></span>
+      </section>
+      <section class="panel total">
+        <span class="label">Open deals</span>
+        <span class="value" id="t-count"></span>
+      </section>
+    </div>
+
+    <section class="panel board-panel">
+      <div class="board" id="board"></div>
+    </section>
+  </main>
+</div>
+
+<script src="../data.js"></script>
+<script>
+  renderSidebar("pipeline");
+  document.getElementById("new-deal").innerHTML = icon("plus") + "New deal";
+
+  const open = openDeals();
+  const t = totals(open);
+  document.getElementById("t-value").textContent = fmtMoney(t.value);
+  document.getElementById("t-expected").textContent = fmtMoney(t.expected);
+  document.getElementById("t-count").textContent = open.length;
+
+  // The mockup shows "Data migration" mid-drag from Qualified to Proposal.
+  const DRAGGING = "Data migration";
+  const DROP_BEFORE = "Annual licence renewal";
+
+  function card(d, extra = "") {
+    const date = d.late
+      ? `<div class="card-date late-text">${fmtDate(d.close)}<span class="tag-late">Late</span></div>`
+      : `<div class="card-date">${fmtDate(d.close)}</div>`;
+    return `<div class="card ${extra}">
+      <div class="card-name">${d.name}</div>
+      <div class="card-org">${d.org}</div>
+      <div class="card-figures"><span class="card-value">${fmtMoney(d.value)}</span><span class="card-prob">${d.prob}%</span></div>
+      ${date}
+    </div>`;
+  }
+
+  document.getElementById("board").innerHTML = STAGES.map((s) => {
+    const deals = DEALS.filter((d) => d.stage === s.key);
+    const count = STAGE_COUNTS[s.key] ?? deals.length;
+    const st = totals(deals);
+    const figures = s.open
+      ? `<div><span class="mono">${fmtMoney(st.value)}</span> <span class="muted">open</span></div>
+         <div><span class="mono">${fmtMoney(st.expected)}</span> <span class="muted">expected</span></div>`
+      : "";
+    const cards = deals
+      .filter((d) => d.name !== DRAGGING)
+      .map((d) => (d.name === DROP_BEFORE ? '<div class="placeholder" id="placeholder"></div>' : "") + card(d))
+      .join("");
+    return `<div class="col">
+      <div class="col-head">
+        <div class="col-title"><span class="dot" style="background: ${STAGE_COLOUR[s.key]}"></span>${s.name}<span class="count-badge">${count}</span></div>
+        <div class="col-figures">${figures}</div>
+      </div>
+      <div class="cards">${cards}</div>
+      <div class="add-deal">${icon("plus")}Add deal</div>
+    </div>`;
+  }).join("");
+
+  // Place the lifted card over its placeholder, offset as if following the cursor.
+  const board = document.getElementById("board");
+  const dragged = DEALS.find((d) => d.name === DRAGGING);
+  board.insertAdjacentHTML("beforeend", card(dragged, "lifted"));
+  const lifted = board.querySelector(".lifted");
+  const ph = document.getElementById("placeholder");
+
+  function place() {
+    const b = board.getBoundingClientRect();
+    const p = ph.getBoundingClientRect();
+    lifted.style.width = p.width + "px";
+    ph.style.height = lifted.offsetHeight + "px";
+    const p2 = ph.getBoundingClientRect();
+    lifted.style.left = p2.left - b.left + 14 + "px";
+    lifted.style.top = p2.top - b.top - 10 + "px";
+  }
+  place();
+  document.fonts.ready.then(place);
+  window.addEventListener("resize", place);
+</script>
+</body>
+</html>

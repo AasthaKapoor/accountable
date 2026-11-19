@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard · Accountable · Option C</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../mockup.css">
+<style>
+  /* Main column for the figures and charts, a rail on the right for what needs doing */
+  .layout { display: grid; grid-template-columns: 1fr 360px; gap: var(--gutter); align-items: start; }
+  .stack-v { display: flex; flex-direction: column; gap: var(--gutter); min-width: 0; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gutter); }
+
+  /* Headline figures in one panel */
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 8px; }
+  .kpi { padding: 14px 14px 16px; border-radius: 10px; }
+  .kpi:hover { background: var(--bg); }
+  .kpi-chip { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; margin-bottom: 12px; }
+  .kpi-chip svg { width: 18px; height: 18px; }
+  .kpi-label { color: var(--ink-muted); font-weight: 500; font-size: 13px; }
+  .kpi-value { font: 600 25px/1.25 var(--mono); letter-spacing: -0.02em; }
+  .kpi-sub { font-size: 12.5px; color: var(--ink-muted); display: flex; align-items: center; gap: 4px; }
+  .kpi-sub svg { width: 14px; height: 14px; color: var(--tertiary); }
+
+  /* Line chart and bar chart share one panel and one month axis */
+  .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .chart text { font-family: var(--mono); font-size: 11px; fill: var(--ink-muted); }
+  .sub-head { display: flex; justify-content: space-between; align-items: center; margin: 18px 0 6px; font-weight: 600; font-size: 14px; }
+  .legend { display: flex; gap: 16px; color: var(--ink-muted); font-size: 13px; font-weight: 400; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+  /* Centred funnel */
+  .funnel { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+  .fbar { height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; font-weight: 500; white-space: nowrap; }
+  .fbar .mono { font-weight: 600; }
+  .fconv { font: 500 11.5px var(--mono); color: var(--ink-muted); }
+
+  /* Pipeline by stage as tiles */
+  .stack { display: flex; height: 14px; gap: 3px; margin-bottom: 16px; }
+  .stack span { border-radius: 999px; }
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .tile { background: var(--bg); border-radius: 10px; padding: 12px; }
+  .tile .n { display: flex; align-items: center; gap: 8px; font-weight: 500; }
+  .tile .n .muted { margin-left: auto; font: 12px var(--mono); }
+  .tile .v { font: 600 17px var(--mono); margin-top: 6px; }
+
+  /* Rail */
+  .rail { padding: 20px; display: flex; flex-direction: column; gap: 20px; position: sticky; top: 28px; }
+  .rail h2 { margin: 0; font-size: 16px; font-weight: 600; }
+  .seg { display: flex; padding: 4px; border-radius: 999px; background: var(--bg); margin: 12px 0 8px; }
+  .seg > span { flex: 1; display: flex; justify-content: center; align-items: center; gap: 8px; height: 30px; border-radius: 999px; font-weight: 500; color: var(--ink-muted); }
+  .seg .active { background: var(--panel); color: var(--ink); box-shadow: var(--shadow); }
+
+  .follow { display: grid; grid-template-columns: 20px 1fr; gap: 10px; padding: 9px 0; }
+  .check { width: 18px; height: 18px; border-radius: 6px; border: 1.5px solid rgba(7, 59, 76, 0.3); margin-top: 1px; }
+  .follow .meta { font-size: 12.5px; display: flex; gap: 8px; margin-top: 1px; }
+  .follow .meta .mono { color: var(--alert); }
+
+  .rail-sep { height: 8px; border-radius: 999px; background: var(--bg); }
+
+  /* Activity as a timeline */
+  .timeline { position: relative; margin-top: 12px; }
+  .tl-item { position: relative; display: grid; grid-template-columns: 28px 1fr; gap: 10px; padding-bottom: 14px; }
+  .tl-item::before { content: ""; position: absolute; left: 13px; top: 28px; bottom: 0; width: 2px; background: var(--bg); }
+  .tl-item:last-child::before { display: none; }
+  .tl-icon { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--bg); }
+  .tl-icon svg { width: 14px; height: 14px; }
+  .tl-desc { font-weight: 500; line-height: 1.35; }
+  .tl-meta { font-size: 12.5px; color: var(--ink-muted); margin-top: 1px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar"></aside>
+  <main class="main">
+    <div class="title-row">
+      <div>
+        <h1>Dashboard</h1>
+        <div class="sub">Thursday 19 Nov 2026</div>
+      </div>
+      <button class="btn btn-primary" id="new-deal"></button>
+    </div>
+
+    <div class="layout">
+      <div class="stack-v">
+        <section class="panel kpis" id="kpis"></section>
+
+        <section class="panel">
+          <div class="panel-head"><h2>Revenue won by month</h2><span class="hint">Last 12 months</span></div>
+          <div class="chart" id="line"></div>
+          <div class="sub-head">Deals won and lost
+            <div class="legend"><span><i style="background: var(--primary)"></i>Won</span><span><i style="background: var(--tertiary)"></i>Lost</span></div>
+          </div>
+          <div class="chart" id="bars"></div>
+        </section>
+
+        <div class="two">
+          <section class="panel">
+            <div class="panel-head"><h2>Sales funnel</h2><span class="hint">Value reaching each stage</span></div>
+            <div class="funnel" id="funnel"></div>
+          </section>
+          <section class="panel">
+            <div class="panel-head"><h2>Pipeline by stage</h2><a href="pipeline.html">View pipeline</a></div>
+            <div class="stack" id="stack"></div>
+            <div class="tiles" id="tiles"></div>
+          </section>
+        </div>
+      </div>
+
+      <aside class="panel rail">
+        <div>
+          <h2>Follow-ups</h2>
+          <div class="seg"><span class="active">Overdue <span class="count-badge alert">5</span></span><span>Upcoming <span class="count-badge quiet">8</span></span></div>
+          <div id="followups"></div>
+        </div>
+        <div class="rail-sep"></div>
+        <div>
+          <h2>Recent activity</h2>
+          <div class="timeline" id="activity"></div>
+        </div>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<script src="../data.js"></script>
+<script>
+  renderSidebar("dashboard");
+  document.getElementById("new-deal").innerHTML = icon("plus") + "New deal";
+
+  const open = openDeals();
+  const t = totals(open);
+  const nov = MONTHS[11].won, oct = MONTHS[10].won;
+
+  const KPIS = [
+    ["pipeline", "rgba(17,138,178,0.14)", "#118AB2", "Open pipeline value", fmtMoney(t.value), `${open.length} open deals`],
+    ["deals", "rgba(255,193,69,0.25)", "#B07A0A", "Expected revenue", fmtMoney(t.expected), "Value times probability"],
+    ["dashboard", "rgba(6,214,160,0.18)", "#05A87E", "Won this month", fmtMoney(nov), `${icon("down")}Down ${Math.round((1 - nov / oct) * 100)}% on October`],
+    ["contacts", "rgba(247,140,107,0.2)", "#C2552F", "Win rate, 90 days", "67%", "8 won, 4 lost"],
+  ];
+  document.getElementById("kpis").innerHTML = KPIS.map(([ic, bg, fg, label, value, sub]) => `
+    <div class="kpi">
+      <div class="kpi-chip" style="background: ${bg}; color: ${fg}">${icon(ic)}</div>
+      <div class="kpi-label">${label}</div>
+      <div class="kpi-value">${value}</div>
+      <div class="kpi-sub">${sub}</div>
+    </div>`).join("");
+
+  // Shared month axis for the line and the bars
+  const W = 760, L = 48, R = 12;
+  const x = (i) => L + 20 + (i * (W - L - R - 40)) / 11;
+
+  (function () {
+    const H = 220, T = 10, B = 10, max = 100000;
+    const y = (v) => T + (1 - v / max) * (H - T - B);
+    const pts = MONTHS.map((d, i) => [x(i), y(d.won)]);
+    const line = pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" ");
+    let s = "";
+    for (let v = 0; v <= max; v += 25000) {
+      s += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="rgba(7,59,76,0.08)"/>`;
+      s += `<text x="${L - 10}" y="${y(v) + 4}" text-anchor="end">${v ? fmtShort(v) : "£0"}</text>`;
+    }
+    pts.forEach((p, i) => (s += `<text x="${p[0]}" y="${p[1] - 12}" text-anchor="middle" style="fill: #073B4C; font-size: 10.5px">${fmtShort(MONTHS[i].won)}</text>`));
+    document.getElementById("line").innerHTML = `<svg viewBox="0 0 ${W} ${H}">
+      <defs><linearGradient id="f" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#06D6A0" stop-opacity="0.25"/><stop offset="1" stop-color="#06D6A0" stop-opacity="0"/></linearGradient></defs>
+      ${s}
+      <path d="${line} L ${x(11)} ${y(0)} L ${x(0)} ${y(0)} Z" fill="url(#f)"/>
+      <path d="${line}" fill="none" stroke="#06D6A0" stroke-width="2.5" stroke-linejoin="round"/>
+      ${pts.map((p) => `<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="#fff" stroke="#06D6A0" stroke-width="2"/>`).join("")}
+    </svg>`;
+  })();
+
+  (function () {
+    const H = 120, T = 6, B = 24, max = 3;
+    const y = (v) => T + (1 - v / max) * (H - T - B);
+    let s = "";
+    for (let v = 0; v <= max; v++) {
+      s += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="rgba(7,59,76,0.08)"/>`;
+      s += `<text x="${L - 10}" y="${y(v) + 4}" text-anchor="end">${v}</text>`;
+    }
+    MONTHS.forEach((d, i) => {
+      const cx = x(i), bw = 12;
+      if (d.wonCount) s += `<rect x="${cx - bw - 1}" y="${y(d.wonCount)}" width="${bw}" height="${y(0) - y(d.wonCount)}" rx="3" fill="#06D6A0"/>`;
+      if (d.lostCount) s += `<rect x="${cx + 1}" y="${y(d.lostCount)}" width="${bw}" height="${y(0) - y(d.lostCount)}" rx="3" fill="#F78C6B"/>`;
+      s += `<text x="${cx}" y="${H - 4}" text-anchor="middle">${d.m}</text>`;
+    });
+    document.getElementById("bars").innerHTML = `<svg viewBox="0 0 ${W} ${H}">${s}</svg>`;
+  })();
+
+  // Funnel: bars centred, narrowing with value
+  const textOn = { new: "#FFFFFF", qualified: "#073B4C", proposal: "#073B4C", negotiation: "#FFFFFF", won: "#073B4C" };
+  document.getElementById("funnel").innerHTML = FUNNEL.map((f, i) => {
+    const conv = i ? `<div class="fconv">↓ ${Math.round((f.value / FUNNEL[i - 1].value) * 100)}%</div>` : "";
+    return `${conv}<div class="fbar" style="width: ${45 + (f.value / FUNNEL[0].value) * 55}%; background: ${STAGE_COLOUR[f.key]}; color: ${textOn[f.key]}">
+      <span>${f.name}</span><span class="mono">${fmtShort(f.value)}</span></div>`;
+  }).join("");
+
+  // Pipeline by stage
+  const byStage = STAGES.filter((s) => s.open).map((s) => {
+    const ds = open.filter((d) => d.stage === s.key);
+    return { ...s, count: ds.length, value: totals(ds).value };
+  });
+  document.getElementById("stack").innerHTML = byStage.map((s) => `<span style="flex: ${s.value}; background: ${STAGE_COLOUR[s.key]}"></span>`).join("");
+  document.getElementById("tiles").innerHTML = byStage.map((s) => `
+    <div class="tile">
+      <div class="n"><span class="dot" style="background: ${STAGE_COLOUR[s.key]}"></span>${s.name}<span class="muted">${s.count}</span></div>
+      <div class="v">${fmtMoney(s.value)}</div>
+      <div class="muted" style="font-size: 12.5px">${Math.round((s.value / t.value) * 100)}% of open value</div>
+    </div>`).join("");
+
+  document.getElementById("followups").innerHTML = FOLLOW.map(([[y, m, d], desc, subject]) => `
+    <div class="follow">
+      <span class="check"></span>
+      <div>${desc}<div class="meta"><span class="mono">${fmtDate(new Date(y, m - 1, d))}</span><a href="#">${subject}</a></div></div>
+    </div>`).join("");
+
+  document.getElementById("activity").innerHTML = ACTIVITY.map(([type, desc, subject, linked, time, stage]) => {
+    const ic = type === "stage"
+      ? `<span class="tl-icon" style="background: ${STAGE_COLOUR[stage]}; color: ${stage === "won" || stage === "qualified" ? "#073B4C" : "#FFFFFF"}">${icon("arrow", 'stroke-width="2.4"')}</span>`
+      : `<span class="tl-icon">${icon(type)}</span>`;
+    const link = linked ? `<a href="#">${subject}</a>` : subject;
+    return `<div class="tl-item">${ic}<div><div class="tl-desc">${desc}</div><div class="tl-meta">${link} · ${time}</div></div></div>`;
+  }).join("");
+</script>
+</body>
+</html>

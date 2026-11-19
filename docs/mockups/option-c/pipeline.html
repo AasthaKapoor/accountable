@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pipeline · Accountable · Option C</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../mockup.css">
+<style>
+  .title-left { display: flex; align-items: center; gap: 20px; }
+  .chips { display: flex; gap: 8px; }
+  .chip { display: inline-flex; align-items: baseline; gap: 8px; height: 34px; padding: 0 14px; border-radius: 999px; background: var(--panel); box-shadow: var(--shadow); line-height: 34px; color: var(--ink-muted); }
+  .chip .mono { color: var(--ink); font-weight: 600; font-size: 15px; }
+
+  /* Every column is its own white panel; the row scrolls sideways when narrow */
+  .board-scroll { overflow-x: auto; padding-bottom: 4px; }
+  .board { display: grid; grid-template-columns: repeat(4, minmax(180px, 1fr)) repeat(2, minmax(150px, 0.85fr)); gap: 14px; align-items: start; }
+
+  .col { background: var(--panel); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 12px 10px; display: flex; flex-direction: column; gap: 8px; }
+  .col-head { padding: 0 2px 4px; }
+  .col-title { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+  .col-title .count-badge { margin-left: auto; background: var(--bg); color: var(--ink-muted); }
+  .col-value { font: 600 20px/1.3 var(--mono); margin-top: 8px; letter-spacing: -0.02em; }
+  .col-exp { font-size: 12px; color: var(--ink-muted); }
+  .col-exp .mono { color: var(--ink); }
+  .share { height: 6px; border-radius: 999px; background: var(--bg); margin-top: 10px; overflow: hidden; }
+  .share span { display: block; height: 100%; border-radius: 999px; }
+  .col-closed { min-height: 66px; }
+
+  .cards { display: flex; flex-direction: column; gap: 6px; max-height: 600px; overflow-y: auto; }
+  .card { background: var(--bg); border-radius: 9px; padding: 10px 11px; cursor: grab; }
+  .card:hover { background: #E6EDEF; }
+  .card.late { background: rgba(239, 71, 111, 0.09); }
+  .card-top { display: flex; justify-content: space-between; gap: 8px; }
+  .card-name { font-weight: 500; line-height: 1.3; }
+  .card-prob { font: 500 11.5px var(--mono); color: var(--ink-muted); padding-top: 2px; }
+  .card-org { color: var(--ink-muted); font-size: 12.5px; }
+  .card-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+  .card-value { font: 600 13.5px var(--mono); }
+  .card-date { font: 11.5px var(--mono); color: var(--ink-muted); }
+  .card.late .card-date { color: var(--alert); }
+  .card-late { margin-top: 6px; }
+  .card .tag-late { height: 18px; font-size: 11px; }
+
+  /* Closed stages: compact rows */
+  .mini { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-radius: 8px; background: var(--bg); font-size: 13px; }
+  .mini span:first-child { line-height: 1.3; }
+  .mini .mono { font-size: 12.5px; font-weight: 500; }
+
+  .add-deal { display: flex; align-items: center; justify-content: center; gap: 6px; height: 34px; border-radius: 8px; color: var(--ink-muted); font-weight: 500; }
+  .add-deal svg { width: 15px; height: 15px; }
+  .add-deal:hover { background: var(--bg); }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar"></aside>
+  <main class="main">
+    <div class="title-row">
+      <div class="title-left">
+        <h1>Pipeline</h1>
+        <div class="chips">
+          <span class="chip">Open value <span class="mono" id="t-value"></span></span>
+          <span class="chip">Expected <span class="mono" id="t-expected"></span></span>
+          <span class="chip">Open deals <span class="mono" id="t-count"></span></span>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="new-deal"></button>
+    </div>
+
+    <div class="board-scroll">
+      <div class="board" id="board"></div>
+    </div>
+  </main>
+</div>
+
+<script src="../data.js"></script>
+<script>
+  renderSidebar("pipeline");
+  document.getElementById("new-deal").innerHTML = icon("plus") + "New deal";
+
+  const open = openDeals();
+  const t = totals(open);
+  document.getElementById("t-value").textContent = fmtMoney(t.value);
+  document.getElementById("t-expected").textContent = fmtMoney(t.expected);
+  document.getElementById("t-count").textContent = open.length;
+
+  function card(d) {
+    return `<div class="card ${d.late ? "late" : ""}">
+      <div class="card-top"><span class="card-name">${d.name}</span><span class="card-prob">${d.prob}%</span></div>
+      <div class="card-org">${d.org}</div>
+      <div class="card-bottom">
+        <span class="card-value">${fmtMoney(d.value)}</span>
+        <span class="card-date">${fmtDate(d.close)}</span>
+      </div>
+      ${d.late ? '<div class="card-late"><span class="tag-late">Late</span></div>' : ""}
+    </div>`;
+  }
+
+  const mini = (d) => `<div class="mini"><span>${d.name}</span><span class="mono">${fmtMoney(d.value)}</span></div>`;
+
+  document.getElementById("board").innerHTML = STAGES.map((s) => {
+    const deals = DEALS.filter((d) => d.stage === s.key);
+    const count = STAGE_COUNTS[s.key] ?? deals.length;
+    const st = totals(deals);
+    const figures = s.open
+      ? `<div class="col-value">${fmtMoney(st.value)}</div>
+         <div class="col-exp"><span class="mono">${fmtMoney(st.expected)}</span> expected</div>
+         <div class="share"><span style="width: ${(st.value / t.value) * 100}%; background: ${STAGE_COLOUR[s.key]}"></span></div>`
+      : `<div class="col-closed"></div>`;
+    return `<div class="col">
+      <div class="col-head">
+        <div class="col-title"><span class="dot" style="background: ${STAGE_COLOUR[s.key]}"></span>${s.name}<span class="count-badge">${count}</span></div>
+        ${figures}
+      </div>
+      <div class="cards">${deals.map(s.open ? card : mini).join("")}</div>
+      <div class="add-deal">${icon("plus")}Add deal</div>
+    </div>`;
+  }).join("");
+</script>
+</body>
+</html>

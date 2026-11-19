@@ -1,0 +1,22 @@
+{
+  "name": "accountable",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web -c cyan,green \"npm:dev:backend\" \"npm:dev:frontend\"",
+    "dev:backend": "uv run uvicorn accountable.main:app --port 8000 --reload --reload-dir backend",
+    "dev:frontend": "npm run dev -w frontend",
+    "seed": "node scripts/seed.mjs",
+    "test": "npm run test:backend && npm run test:frontend && npm run test:e2e",
+    "test:backend": "uv run pytest -q",
+    "test:frontend": "npm run test -w frontend",
+    "test:e2e": "playwright test -c e2e/playwright.config.ts"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "concurrently": "^10.0.7"
+  }
+}

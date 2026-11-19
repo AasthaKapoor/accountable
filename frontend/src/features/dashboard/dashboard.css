@@ -1,0 +1,68 @@
+/* Dashboard, as in docs/mockups/option-b/dashboard.html */
+.dash-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gutter); align-items: start; }
+.span-4 { grid-column: span 4; }
+.span-5 { grid-column: span 5; }
+.span-7 { grid-column: span 7; }
+.span-8 { grid-column: span 8; }
+.span-12 { grid-column: span 12; }
+.dash-grid > .panel { align-self: stretch; }
+.dash-grid > .panel.top { align-self: start; }
+
+.hero {
+  background: var(--ink); color: var(--sea-mist); border-radius: var(--radius-hero); padding: 28px;
+  display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 32px;
+}
+.hero-label { font-weight: 500; color: var(--sea-mist-muted); }
+.hero-big { font: 600 46px/1.1 var(--mono); color: #FFFFFF; letter-spacing: -0.03em; margin: 6px 0 22px; }
+.hero-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 20px; }
+.hero-stat .v { font: 600 21px/1.2 var(--mono); color: #FFFFFF; margin-top: 2px; }
+.hero-stat .s { font-size: 12.5px; color: rgba(205, 216, 219, 0.7); display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+.hero-stat .s svg { width: 14px; height: 14px; color: var(--tertiary); }
+.hero-stat .s svg.up { color: var(--primary); }
+.ring { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+.hero-chart-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.hero-chart-head h2 { margin: 0; font-size: 16px; color: #FFFFFF; }
+.hero-chart { height: 220px; }
+.hero-stack { grid-column: 1 / -1; display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 32px; align-items: center; padding-top: 4px; }
+.hero-stack-title { display: flex; justify-content: space-between; align-items: baseline; }
+.hero-stack-title h2 { margin: 0; color: #FFFFFF; font-size: 16px; }
+.hero-stack a { color: var(--primary); font-weight: 500; }
+.stack { display: flex; gap: 4px; }
+.stack > div { min-width: 0; }
+.stack .bar { height: 12px; border-radius: 999px; }
+.stack .lab { margin-top: 8px; font-size: 12.5px; color: var(--sea-mist-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stack .lab .mono { color: #FFFFFF; display: block; font-size: 13px; }
+
+.chart-tooltip { background: #FFFFFF; color: var(--ink); border-radius: 8px; padding: 8px 12px; box-shadow: var(--shadow-lifted); font-size: 12px; }
+.chart-tooltip strong { display: block; font-weight: 600; }
+.chart-tooltip .mono { font-size: 12px; }
+
+.legend { display: flex; gap: 16px; color: var(--ink-muted); font-size: 13px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+.funnel { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: end; height: 250px; }
+.fcol { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; position: relative; }
+.fcol .fv { font: 600 15px var(--mono); margin-bottom: 8px; }
+.fcol .fb { width: 72%; border-radius: 10px 10px 4px 4px; min-height: 4px; }
+.fcol .fn { margin-top: 10px; font-weight: 500; }
+.conv {
+  position: absolute; left: -24px; bottom: 44px; height: 24px; padding: 0 8px; border-radius: 999px; background: var(--panel);
+  box-shadow: 0 2px 8px rgba(7, 59, 76, 0.12); font: 600 11.5px/24px var(--mono); z-index: 1;
+}
+
+.rows { display: flex; flex-direction: column; }
+.row { display: grid; align-items: center; gap: 12px; padding: 9px 8px; margin: 0 -8px; border-radius: 8px; }
+.row:hover { background: var(--bg); }
+.follow-row { grid-template-columns: 20px 92px minmax(0, 1fr); }
+.follow-row .d { font: 12.5px var(--mono); }
+.follow-row .d.overdue { color: var(--alert); }
+.follow-row .sub { font-size: 13px; }
+.act-row { grid-template-columns: 10px minmax(0, 1fr) auto auto; }
+.act-row .desc { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.act-row .desc a, .act-row .desc .kept { margin-left: 6px; font-size: 13px; }
+.act-row .t { color: var(--ink-muted); font-size: 12.5px; white-space: nowrap; }
+
+.welcome { text-align: center; padding: 56px 24px; }
+.welcome h2 { font: 400 40px/1.1 var(--serif); letter-spacing: 0; margin: 0 0 10px; }
+.welcome p { color: var(--ink-muted); margin: 0 0 20px; }
