@@ -34,7 +34,7 @@ test("drag a card to another column, then within a column", async ({ page }) => 
   await page.goto("/pipeline");
   await expect(page.getByTestId("board-value")).toHaveText("£263,500");
   await expect(page.getByTestId("board-expected")).toHaveText("£126,050");
-  expect(await cardNames(page, "Qualified")).toEqual(["Fleet tracking rollout", "Data migration", "Staff training"]);
+  await expect.poll(() => cardNames(page, "Qualified")).toEqual(["Fleet tracking rollout", "Data migration", "Staff training"]);
 
   // Support contract (New, £9,500) onto the top half of Data migration in Qualified
   const release = await holdMoves(page);
@@ -46,20 +46,20 @@ test("drag a card to another column, then within a column", async ({ page }) => 
   await expect(column(page, "New").getByTestId("column-value")).toHaveText("£24,000");
   await expect(column(page, "Qualified").getByTestId("column-value")).toHaveText("£83,200");
   await expect(column(page, "Qualified").getByTestId("column-count")).toHaveText("4");
-  expect(await cardNames(page, "Qualified")).toEqual(["Fleet tracking rollout", "Support contract", "Data migration", "Staff training"]);
+  await expect.poll(() => cardNames(page, "Qualified")).toEqual(["Fleet tracking rollout", "Support contract", "Data migration", "Staff training"]);
   release();
 
   await page.reload();
-  expect(await cardNames(page, "Qualified")).toEqual(["Fleet tracking rollout", "Support contract", "Data migration", "Staff training"]);
+  await expect.poll(() => cardNames(page, "Qualified")).toEqual(["Fleet tracking rollout", "Support contract", "Data migration", "Staff training"]);
   await expect(card(page, "Support contract")).toContainText("25%");
 
   // Within a column: Analytics pilot to the top of New
-  expect(await cardNames(page, "New")).toEqual(["Website rebuild", "Analytics pilot"]);
+  await expect.poll(() => cardNames(page, "New")).toEqual(["Website rebuild", "Analytics pilot"]);
   await drag(page, card(page, "Analytics pilot"), card(page, "Website rebuild"), "top");
   await expect.poll(() => cardNames(page, "New")).toEqual(["Analytics pilot", "Website rebuild"]);
   await page.waitForLoadState("networkidle");
   await page.reload();
-  expect(await cardNames(page, "New")).toEqual(["Analytics pilot", "Website rebuild"]);
+  await expect.poll(() => cardNames(page, "New")).toEqual(["Analytics pilot", "Website rebuild"]);
 
   // The deals list shows the new stage and probability
   await page.goto("/deals");
@@ -75,7 +75,7 @@ test("drop at the bottom of a column", async ({ page }) => {
   await expect.poll(() => cardNames(page, "Proposal")).toEqual(["Clinic booking system", "Annual licence renewal", "Website rebuild"]);
   await page.waitForLoadState("networkidle");
   await page.reload();
-  expect(await cardNames(page, "Proposal")).toEqual(["Clinic booking system", "Annual licence renewal", "Website rebuild"]);
+  await expect.poll(() => cardNames(page, "Proposal")).toEqual(["Clinic booking system", "Annual licence renewal", "Website rebuild"]);
   await expect(card(page, "Website rebuild")).toContainText("50%");
 });
 
@@ -88,7 +88,7 @@ test("a rejected move puts the card back and says why", async ({ page }) => {
   page.removeAllListeners("console");
   await drag(page, card(page, "Support contract"), card(page, "Data migration"), "top");
   await expect(page.locator(".toast-title", { hasText: "Couldn't move the deal. Deal not found" })).toBeVisible();
-  expect(await cardNames(page, "New")).toEqual(["Website rebuild", "Support contract", "Analytics pilot"]);
+  await expect.poll(() => cardNames(page, "New")).toEqual(["Website rebuild", "Support contract", "Analytics pilot"]);
   await expect(page.getByTestId("board-expected")).toHaveText("£126,050");
 });
 
