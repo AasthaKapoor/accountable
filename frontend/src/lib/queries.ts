@@ -8,12 +8,24 @@ export function useRefreshAll() {
   return () => queryClient.invalidateQueries();
 }
 
+/** The server's largest page size. */
+const MAX_PAGE_SIZE = 100;
+
+/** Every item of a list endpoint, fetching page after page until the total is reached. */
+export async function fetchAll<T>(path: string, query: Record<string, string | number | undefined> = {}): Promise<T[]> {
+  const items: T[] = [];
+  for (let page = 1; ; page++) {
+    const result = await api.get<Page<T>>(path, { ...query, page, page_size: MAX_PAGE_SIZE });
+    items.push(...result.items);
+    if (result.items.length === 0 || items.length >= result.total) return items;
+  }
+}
+
 /** Every organization, for pickers. */
 export function useOrganizationOptions() {
   return useQuery({
     queryKey: ["organizations", "options"],
-    queryFn: () => api.get<Page<Organization>>("/organizations", { sort: "name", page_size: 100 }),
-    select: (page) => page.items,
+    queryFn: () => fetchAll<Organization>("/organizations", { sort: "name" }),
   });
 }
 
@@ -21,8 +33,7 @@ export function useOrganizationOptions() {
 export function useContactOptions(organizationId: number | undefined) {
   return useQuery({
     queryKey: ["contacts", "options", organizationId],
-    queryFn: () => api.get<Page<Contact>>("/contacts", { organization_id: organizationId, sort: "name", page_size: 100 }),
-    select: (page) => page.items,
+    queryFn: () => fetchAll<Contact>("/contacts", { organization_id: organizationId, sort: "name" }),
     enabled: organizationId !== undefined,
   });
 }

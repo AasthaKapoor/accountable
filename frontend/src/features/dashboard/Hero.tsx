@@ -68,7 +68,7 @@ export function Hero({ data }: { data: Dashboard }) {
           <div className="hero-stat">
             <div className="hero-label">Open deals</div>
             <div className="v" data-testid="open-count">{data.totals.count}</div>
-            <div className="s" data-testid="late-count" style={data.late_count ? { color: "#F7A3B7" } : undefined}>
+            <div className="s" data-testid="late-count">
               {data.late_count} running late
             </div>
           </div>

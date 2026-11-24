@@ -49,7 +49,7 @@ h1, h2, h3 { font-weight: 600; letter-spacing: -0.01em; }
 
 .main { margin-left: var(--sidebar-width); flex: 1; min-width: 0; padding: 28px 32px 48px; }
 
-.title-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: var(--gutter); min-height: 44px; }
+.title-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: var(--gutter); }
 .title-row h1 { margin: 0; font-size: 24px; }
 .title-row .sub { margin-top: 2px; color: var(--ink-muted); }
 .title-row .crumb { font-size: 13px; color: var(--ink-muted); margin-bottom: 2px; }

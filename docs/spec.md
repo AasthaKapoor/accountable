@@ -226,7 +226,7 @@ The layout is two columns. On the left is a details panel with an Edit button. O
   - A Contacts panel, which can add a contact pre-filled with this organization.
   - A Deals panel, which can add a deal the same way.
   - The organization's open value and expected revenue.
-- **Contact**: the details, a link to their organization, their deals, and the timeline.
+- **Contact**: the details, a link to their organization, their deals, and the timeline. The Deals panel can add a deal pre-filled with this contact and their organization.
 - **Deal**:
   - The details: a stage pill with a stage dropdown, the value, the probability (marked "set by hand" when manual), the close date, the organization and the contact.
   - The timeline.

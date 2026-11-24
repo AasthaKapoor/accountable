@@ -36,6 +36,12 @@ class TestSearch:
         assert names(client.get("/api/deals?search=harbour")) == ["Risk reporting"]
         assert names(client.get("/api/deals?search=isla")) == ["Studio CMS"]
 
+    def test_wildcards_match_themselves(self, client, data, make):
+        make.org("100% Organic_Co", industry="Food")
+        assert names(client.get("/api/organizations?search=%25")) == ["100% Organic_Co"]
+        assert names(client.get("/api/organizations?search=_")) == ["100% Organic_Co"]
+        assert names(client.get("/api/organizations?search=%5C")) == []
+
     def test_blank_search_matches_everything(self, client, data):
         assert len(names(client.get("/api/organizations?search=%20"))) == 3
 

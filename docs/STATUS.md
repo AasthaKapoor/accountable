@@ -49,8 +49,19 @@ This runs pytest, then Vitest, then Playwright (which starts its own copy of the
 - MVP built (19 Nov 2026), following the plan's phases 1 to 8:
   - Backend: FastAPI and SQLAlchemy Core on SQLite, every rule in spec section 3, the API in section 4, and a deterministic seed.
   - Frontend: all five sections, record pages with timelines, the drag-and-drop pipeline with optimistic totals and rollback, and the option B dashboard.
-  - Tests: 163 pytest, 79 Vitest and 32 Playwright tests, covering everything in the plan's Proof section, plus empty, loading and error states.
+  - Tests: 164 pytest, 80 Vitest and 33 Playwright tests (after the review fixes below), covering everything in the plan's Proof section, plus empty, loading and error states.
   - Every screen checked in Chrome against the option B mockups, with no console errors.
+
+## Review against `docs/REVIEW.md` (24 Nov 2026)
+
+No tests failed in the review: 163 pytest, 79 Vitest and 32 Playwright all passed. The review found these problems, now fixed, each with a new test that failed before the fix:
+
+- **Deleting the last rows on the final page left an empty page.** The table showed "No ... yet." with no pager, even though records still existed, because nothing moved the page back. `DataTable` now goes to the new last page when the current one comes back empty. Test: `e2e/organizations.spec.ts`, "deleting the only row on the last page goes back a page".
+- **Search treated `%` and `_` as wildcards.** The search text went into SQL `LIKE` unescaped, so searching for `_` matched every contact. `listing.py` now escapes them. Test: `test_listing.py`, `test_wildcards_match_themselves`.
+- **The organization and contact pickers only loaded the first 100 records.** They asked for one page of 100, the server's largest. Past that, records were missing from the deal and contact forms. They now fetch every page (`fetchAll` in `lib/queries.ts`). Test: `lib/queries.test.ts`.
+- **The Contact page's "Add deal" button wasn't in the spec.** It was kept, and `docs/spec.md` section 6.3 now describes it.
+
+One full `npm test` run after the fixes had one e2e failure (`expect(locator).toBeVisible() failed`). The run's output didn't name the test, and it didn't happen again in three more full runs or in 15 repeats of the new test. It may be an intermittent timing problem and still needs looking into if it comes back.
 
 ## Decisions made while building
 

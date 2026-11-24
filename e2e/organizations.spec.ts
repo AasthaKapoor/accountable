@@ -70,6 +70,25 @@ test("pages through more than 25 organizations", async ({ page }) => {
   await expect(rows(page)).toHaveCount(25);
 });
 
+test("deleting the only row on the last page goes back a page", async ({ page }) => {
+  for (let i = 0; i < 16; i++) {
+    await page.request.post("/api/organizations", { data: { name: `Zed ${String(i).padStart(2, "0")}` } });
+  }
+  await page.goto("/organizations");
+  await page.getByRole("button", { name: "Next" }).click();
+  await expect(page.getByText("26–26 of 26")).toBeVisible();
+
+  await page.getByRole("button", { name: "Actions for Zed 15" }).click();
+  await page.getByRole("menuitem", { name: "Delete" }).click();
+  const dialog = page.getByRole("dialog");
+  await dialog.getByRole("button", { name: "Delete organization" }).click();
+  await expect(dialog).toBeHidden();
+
+  await expect(page.getByText("1–25 of 25")).toBeVisible();
+  await expect(rows(page)).toHaveCount(25);
+  await expect(page.getByText("No organizations yet.")).toHaveCount(0);
+});
+
 test("an organization with contacts and deals can't be deleted", async ({ page }) => {
   await page.goto("/organizations");
   await page.getByRole("button", { name: "Actions for Northgate Logistics" }).click();

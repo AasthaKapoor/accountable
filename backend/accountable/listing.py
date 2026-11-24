@@ -43,8 +43,10 @@ def paginate(
 ) -> dict:
     """Apply search, sort and paging to `query` and return one page with the total."""
     if params.search:
-        needle = f"%{params.search.lower()}%"
-        query = query.where(or_(*(func.lower(func.coalesce(c, "")).like(needle) for c in search_columns)))
+        # Escape LIKE's wildcards so % and _ match themselves.
+        text = params.search.lower().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+        needle = f"%{text}%"
+        query = query.where(or_(*(func.lower(func.coalesce(c, "")).like(needle, escape="\\") for c in search_columns)))
 
     sort = params.sort or default_sort
     if sort not in sort_columns:

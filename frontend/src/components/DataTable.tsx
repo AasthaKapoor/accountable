@@ -111,7 +111,13 @@ export function DataTable<T extends RowData & { id: number }>({
 
   const first = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const last = Math.min(page * PAGE_SIZE, total);
-  const showEmpty = !loading && rows !== undefined && rows.length === 0;
+  const pastTheEnd = rows !== undefined && rows.length === 0 && total > 0 && page > 1;
+  const showEmpty = !loading && rows !== undefined && rows.length === 0 && total === 0;
+
+  // Deleting the last rows on the final page leaves it empty: go back to the new last page.
+  useEffect(() => {
+    if (pastTheEnd) onPageChange(Math.ceil(total / PAGE_SIZE));
+  }, [pastTheEnd, total, onPageChange]);
 
   return (
     <div className="panel table-panel">
@@ -160,7 +166,7 @@ export function DataTable<T extends RowData & { id: number }>({
         </tbody>
       </table>
       {showEmpty && empty}
-      {!showEmpty && (
+      {!showEmpty && !pastTheEnd && (
         <div className="pager">
           <span className="mono" aria-live="polite">
             {first}–{last} of {total}
